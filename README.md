@@ -1,97 +1,102 @@
+Guardian Intelligence Alliance (GIA System)
+Preventive Monitoring and Emergency Response System for Industrial Workers Using IoT and AI
 
-🛡️ Angel Guardian Inteligente (AGI System)
-Sistema de monitoreo preventivo y respuesta ante emergencias para trabajadores industriales usando IoT e IA
+🧭 A. Introduction and Purpose
+GIA System was created to address a critical need: protecting the lives of personnel working in high‑risk environments.
+The system activates the worker’s private location only during emergencies or when entering areas classified as highly dangerous.
 
----
+Its core purpose is to prevent accidents, detect critical health conditions, and coordinate fast and effective response actions.
 
-🧭 A. Introducción y Propósito
+🏗️ B. System Architecture
+🔧 1. Hardware (Smart Helmets / Smart Vests)
+The wearable devices include:
 
-AGI System nace de una necesidad crítica: proteger la vida del personal que opera en áreas de riesgo.  
-El sistema activa la ubicación privada del trabajador únicamente en situaciones de emergencia o cuando ingresa a zonas clasificadas como altamente peligrosas.
+Heart rate and vital signs sensors
 
-El objetivo central es prevenir accidentes, detectar condiciones de salud críticas y coordinar respuestas rápidas y efectivas.
+Accelerometers for fall detection
 
----
+LED alert lights
 
-🏗️ B. Arquitectura del Sistema
+Speakers or vibration motors for immediate notifications
 
-🔧 1. Hardware (Cascos / Chalecos Inteligentes)
-Los dispositivos portátiles incluyen:
+Emergency button
 
-- Sensor de pulso y signos vitales  
-- Acelerómetros para detección de caídas  
-- Luces LED de alerta  
-- Bocinas o vibración para notificaciones inmediatas  
-- Botón de emergencia  
-- Baterías híbridas (carga eléctrica + energía solar)
+Hybrid batteries (electric charging + solar energy)
 
-🌐 2. Conectividad
-El sistema transmite datos únicamente cuando:
+🌐 2. Connectivity
+The system transmits data only when:
 
-- Se detecta un evento de alerta  
-- El trabajador entra a un área de alto riesgo  
-- Se requiere ubicación en tiempo real para rescate  
+An alert event is detected
 
-Esto garantiza privacidad, eficiencia energética y comunicación segura.
+The worker enters a high‑risk area
 
-🖥️ 3. Software (Dashboard Central)
-El panel de control permite al equipo de seguridad:
+Real‑time location is required for rescue
 
-- Monitorear el estado de salud de cada trabajador  
-- Ver ubicación en caso de emergencia  
-- Acceder a información médica esencial:  
-  - Sexo  
-  - Edad  
-  - Tipo de sangre  
-  - Enfermedades o tratamientos  
-  - Historial médico relevante  
-  - Contacto de emergencia  
+This ensures privacy, energy efficiency, and secure communication.
 
-El objetivo es acelerar la toma de decisiones durante incidentes.
+🖥️ 3. Software (Central Dashboard)
+The control panel allows the safety team to:
 
----
+Monitor each worker’s health status
 
-🤖 C. Inteligencia Artificial
+View location during emergencies
 
-🔍 1. Análisis Predictivo
-La IA evalúa patrones para anticipar:
+Access essential medical information:
 
-- Fatiga extrema  
-- Riesgo de paro cardiorrespiratorio  
-- Golpes de calor  
-- Cambios anormales en signos vitales  
-- Condiciones que puedan derivar en accidentes graves  
+Sex
 
-🩺 2. Triaje Automático
-En caso de múltiples emergencias, el sistema clasifica automáticamente:
+Age
 
-- Nivel de gravedad  
-- Prioridad de atención  
-- Recomendaciones de acción inmediata  
+Blood type
 
-Esto permite optimizar recursos de rescate y reducir tiempos críticos.
+Medical conditions or treatments
 
----
+Relevant medical history
 
-📘 D. Reglamento y Lineamientos
+Emergency contact
 
-El sistema incluye un conjunto de reglas operativas diseñadas para:
+The goal is to accelerate decision‑making during critical incidents.
 
-- Garantizar el funcionamiento correcto del hardware y software  
-- Evitar fallas durante emergencias  
-- Asegurar que los datos se usen únicamente para protección y respuesta  
-- Mantener protocolos claros para rescate y comunicación  
+🤖 C. Artificial Intelligence
+🔍 1. Predictive Analysis
+The AI evaluates patterns to anticipate:
 
----
+Extreme fatigue
 
-🚧 Estado del Proyecto
+Risk of cardiorespiratory arrest
 
-Fase actual: Investigación y diseño de arquitectura.  
-Se están definiendo los módulos IoT, la estructura del dashboard, los modelos de IA y los protocolos de comunicación.
+Heat stroke
 
----
+Abnormal changes in vital signs
 
-👤 Autor
+Conditions that may lead to severe accidents
 
-Proyecto creado por René Omar Acosta Martínez  
-Enfocado en Innovación Tecnológica para la Seguridad Industrial.
+🩺 2. Automatic Triage
+In the event of multiple emergencies, the system automatically classifies:
+
+Severity level
+
+Priority of attention
+
+Immediate action recommendations
+
+This optimizes rescue resources and reduces critical response times.
+
+📘 D. Regulations and Guidelines
+The system includes a set of operational rules designed to:
+
+Ensure proper functioning of hardware and software
+
+Prevent failures during emergencies
+
+Guarantee that data is used solely for protection and response
+
+Maintain clear protocols for rescue and communication
+
+🚧 Project Status
+Current phase: Research and architecture design.
+The IoT modules, dashboard structure, AI models, and communication protocols are currently being defined.
+
+👤 Author
+Project created by René Omar Acosta Martínez,
+Focused on Technological Innovation for Industrial Safety.
