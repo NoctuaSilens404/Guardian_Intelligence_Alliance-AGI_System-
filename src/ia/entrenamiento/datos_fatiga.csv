@@ -1,0 +1,6 @@
+pulso,temperatura,spo2,horas_trabajadas,etiqueta_riesgo
+78,36.8,97,6,bajo
+95,37.5,95,8,medio
+142,38.9,89,10,alto
+120,37.8,92,9,medio
+60,36.5,98,5,bajo
