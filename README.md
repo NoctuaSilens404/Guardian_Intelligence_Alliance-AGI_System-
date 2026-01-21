@@ -36,4 +36,8 @@ Technology applied with human sense:
 📅 Project Roadmap
 You can track the detailed progress of each phase in our Projects section.
 
+👤 Author & Current Phase
+• 	Author / Creator: René O. Acosta
+• 	Current Phase: Early development — building core modules, training AI models, and structuring repository documentation.
+
 Developed with vision, technology, and commitment to life.
