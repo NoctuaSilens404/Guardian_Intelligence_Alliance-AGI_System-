@@ -36,4 +36,8 @@ Tecnología aplicada con sentido humano:
 📅 Roadmap del Proyecto
 Puedes consultar el avance detallado de cada fase en nuestra sección de Projects.
 
+👤 Autor y Fase Actual
+• 	Autor / Creador: René O. Acosta
+• 	Fase Actual: Desarrollo inicial — construcción de módulos principales, entrenamiento de modelos de IA y estructuración de la documentación del repositorio.
+
 Desarrollado con visión, tecnología y compromiso con la vida.
