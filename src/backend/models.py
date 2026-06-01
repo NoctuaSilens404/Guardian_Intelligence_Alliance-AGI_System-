@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional
+from datetime import datetime
 
 class SignosVitales(BaseModel):
     pulso: int = 80
@@ -20,3 +21,8 @@ class Trabajador(BaseModel):
     dni: str
     rol: str
     activo: bool = True
+
+class AlertaDB(BaseModel):
+    alerta: dict
+    resultado: dict
+    timestamp: str = ""

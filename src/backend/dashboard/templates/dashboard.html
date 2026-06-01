@@ -3,295 +3,410 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GIA - Guardian Intelligence Alliance</title>
+<title>GIA - Dashboard</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    font-family: 'Segoe UI', system-ui, sans-serif;
-    background: #0a0e17;
-    color: #e0e0e0;
-    min-height: 100vh;
-  }
-  .header {
-    background: linear-gradient(135deg, #0d1b2a 0%, #1b2838 100%);
-    border-bottom: 1px solid #1e3a5f;
-    padding: 16px 32px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .header h1 {
-    font-size: 20px;
-    font-weight: 600;
-    background: linear-gradient(90deg, #00d4ff, #0077b6);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-  .header .status {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 13px;
-  }
-  .status-dot {
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    background: #00ff88;
-    display: inline-block;
-    animation: pulse 2s infinite;
-  }
-  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-  .status-dot.warning { background: #ffaa00; animation: none; }
-  .status-dot.critical { background: #ff0044; animation: none; }
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0e17;color:#e0e0e0;min-height:100vh}
+.header{background:linear-gradient(135deg,#0d1b2a 0%,#1b2838 100%);border-bottom:1px solid #1e3a5f;padding:12px 24px;display:flex;justify-content:space-between;align-items:center}
+.header h1{font-size:16px;background:linear-gradient(90deg,#00d4ff,#0077b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header-controls{display:flex;align-items:center;gap:16px}
+.header .status{display:flex;align-items:center;gap:6px;font-size:12px}
+.status-dot{width:8px;height:8px;border-radius:50%;background:#00ff88;display:inline-block;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.status-dot.warning{background:#ffaa00;animation:none}
+.status-dot.critical{background:#ff0044;animation:none}
+.btn-logout{padding:6px 14px;background:transparent;border:1px solid #1e3a5f;border-radius:6px;color:#6b7280;font-size:12px;cursor:pointer;text-decoration:none}
+.btn-logout:hover{border-color:#ff0044;color:#ff0044}
 
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-    padding: 20px 32px;
-  }
-  @media (max-width: 1200px) { .grid { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:16px 24px}
+@media(max-width:1000px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.grid{grid-template-columns:1fr}}
 
-  .card {
-    background: linear-gradient(135deg, #111827 0%, #1a2332 100%);
-    border: 1px solid #1e3a5f;
-    border-radius: 12px;
-    padding: 20px;
-  }
-  .card h3 {
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: #6b7280;
-    margin-bottom: 12px;
-  }
-  .card .value {
-    font-size: 32px;
-    font-weight: 700;
-    color: #00d4ff;
-  }
-  .card .value.danger { color: #ff0044; }
-  .card .value.warning { color: #ffaa00; }
-  .card .value.success { color: #00ff88; }
+.card{background:linear-gradient(135deg,#111827 0%,#1a2332 100%);border:1px solid #1e3a5f;border-radius:10px;padding:16px}
+.card h3{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#6b7280;margin-bottom:8px}
+.card .value{font-size:28px;font-weight:700;color:#00d4ff}
+.card .value.danger{color:#ff0044}
+.card .value.warning{color:#ffaa00}
+.card .value.success{color:#00ff88}
 
-  .main-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    padding: 0 32px 20px;
-  }
-  @media (max-width: 900px) { .main-grid { grid-template-columns: 1fr; } }
+.main-flex{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 24px 12px}
+@media(max-width:1000px){.main-flex{grid-template-columns:1fr}}
+.panel{background:linear-gradient(135deg,#111827 0%,#1a2332 100%);border:1px solid #1e3a5f;border-radius:10px;padding:16px}
+.panel h3{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#6b7280;margin-bottom:10px}
 
-  .table-card {
-    background: linear-gradient(135deg, #111827 0%, #1a2332 100%);
-    border: 1px solid #1e3a5f;
-    border-radius: 12px;
-    padding: 20px;
-  }
-  .table-card h3 {
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: #6b7280;
-    margin-bottom: 12px;
-  }
+/* Alertas */
+.alert-feed{max-height:320px;overflow-y:auto}
+.alert-feed::-webkit-scrollbar{width:4px}
+.alert-feed::-webkit-scrollbar-track{background:transparent}
+.alert-feed::-webkit-scrollbar-thumb{background:#1e3a5f;border-radius:4px}
+.alert-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #1a2738;font-size:13px;cursor:pointer;transition:background .15s}
+.alert-item:hover{background:rgba(0,212,255,0.04)}
+.alert-icon{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.alert-icon.normal{background:#00ff88}
+.alert-icon.alta{background:#ffaa00}
+.alert-icon.critica{background:#ff0044}
+.alert-time{color:#6b7280;font-size:11px;white-space:nowrap}
+.alert-tipo{font-weight:600;font-size:11px;text-transform:uppercase}
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-  }
-  th {
-    text-align: left;
-    padding: 8px 12px;
-    color: #6b7280;
-    font-weight: 500;
-    border-bottom: 1px solid #1e3a5f;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  td {
-    padding: 10px 12px;
-    border-bottom: 1px solid #1a2738;
-  }
-  tr:hover td { background: rgba(0, 212, 255, 0.03); }
+/* Tabla */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:8px 10px;color:#6b7280;font-weight:500;border-bottom:1px solid #1e3a5f;font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+td{padding:8px 10px;border-bottom:1px solid #1a2738}
+tr:hover td{background:rgba(0,212,255,0.03)}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600}
+.badge.normal{background:rgba(0,255,136,0.15);color:#00ff88}
+.badge.alta{background:rgba(255,170,0,0.15);color:#ffaa00}
+.badge.critica{background:rgba(255,0,68,0.15);color:#ff0044}
+.empty-state{text-align:center;padding:32px 16px;color:#4b5563;font-size:13px}
 
-  .badge {
-    display: inline-block;
-    padding: 2px 10px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 600;
-  }
-  .badge.normal { background: rgba(0, 255, 136, 0.15); color: #00ff88; }
-  .badge.alta { background: rgba(255, 170, 0, 0.15); color: #ffaa00; }
-  .badge.critica { background: rgba(255, 0, 68, 0.15); color: #ff0044; }
+/* Filtros */
+.filtros{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.filtros select,.filtros input{padding:6px 10px;background:#0d1b2a;border:1px solid #1e3a5f;border-radius:6px;color:#e0e0e0;font-size:12px;outline:none}
+.filtros select:focus,.filtros input:focus{border-color:#00d4ff}
+.filtros .btn-export{padding:6px 12px;background:transparent;border:1px solid #00d4ff;border-radius:6px;color:#00d4ff;font-size:12px;cursor:pointer}
+.filtros .btn-export:hover{background:rgba(0,212,255,0.1)}
 
-  .alert-item {
-    display: flex; align-items: center; gap: 12px;
-    padding: 10px 0;
-    border-bottom: 1px solid #1a2738;
-    font-size: 13px;
-  }
-  .alert-icon {
-    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
-  }
-  .alert-icon.normal { background: #00ff88; }
-  .alert-icon.alta { background: #ffaa00; }
-  .alert-icon.critica { background: #ff0044; }
+/* Charts */
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 24px 12px}
+@media(max-width:1000px){.charts-row{grid-template-columns:1fr}}
+.chart-box{background:linear-gradient(135deg,#111827 0%,#1a2332 100%);border:1px solid #1e3a5f;border-radius:10px;padding:16px;position:relative}
+.chart-box h3{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#6b7280;margin-bottom:10px}
+.chart-box canvas{max-height:180px}
 
-  .alert-time { color: #6b7280; font-size: 11px; white-space: nowrap; }
-  .empty-state {
-    text-align: center; padding: 40px 20px; color: #4b5563; font-size: 14px;
-  }
+/* Mapa */
+#map{height:240px;border-radius:8px;border:1px solid #1e3a5f}
+.map-wrap{margin:0 24px 12px}
+.map-wrap .panel{padding:12px}
+.map-wrap .panel h3{margin-bottom:8px}
 
-  .footer-text {
-    text-align: center;
-    padding: 16px;
-    color: #374151;
-    font-size: 12px;
-    border-top: 1px solid #1a2738;
-    margin-top: 8px;
-  }
+/* Panel lateral detalle */
+.detail-overlay{display:none;position:fixed;top:0;right:0;width:380px;height:100vh;background:#111827;border-left:1px solid #1e3a5f;z-index:1000;padding:24px;overflow-y:auto;box-shadow:-4px 0 20px rgba(0,0,0,.5)}
+.detail-overlay.open{display:block}
+.detail-overlay .close{position:absolute;top:12px;right:16px;background:none;border:none;color:#6b7280;font-size:20px;cursor:pointer}
+.detail-overlay .close:hover{color:#ff0044}
+.detail-field{margin-bottom:12px}
+.detail-field label{font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:2px}
+.detail-field .val{font-size:14px;color:#e0e0e0}
+
+/* Modal emergencia */
+.emergency-overlay{display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(255,0,68,0.15);z-index:2000;justify-content:center;align-items:center;backdrop-filter:blur(4px)}
+.emergency-overlay.show{display:flex}
+.emergency-modal{background:#1a0a0a;border:2px solid #ff0044;border-radius:16px;padding:40px;max-width:480px;width:90%;text-align:center;animation:emPulse 1.5s infinite}
+@keyframes emPulse{0%,100%{box-shadow:0 0 20px rgba(255,0,68,.3)}50%{box-shadow:0 0 40px rgba(255,0,68,.6)}}
+.emergency-modal h2{color:#ff0044;font-size:24px;margin-bottom:8px}
+.emergency-modal .em-icon{font-size:48px;margin-bottom:12px}
+.emergency-modal p{color:#e0e0e0;font-size:14px;margin-bottom:6px}
+.emergency-modal .em-btn{margin-top:16px;padding:10px 32px;background:#ff0044;border:none;border-radius:8px;color:#fff;font-size:14px;font-weight:600;cursor:pointer}
+.emergency-modal .em-btn:hover{background:#cc0033}
+
+/* Footer */
+.footer-text{text-align:center;padding:12px;color:#374151;font-size:11px;border-top:1px solid #1a2738;margin-top:4px}
 </style>
 </head>
 <body>
 
+<div class="emergency-overlay" id="emergencyOverlay">
+  <div class="emergency-modal">
+    <div class="em-icon">🚨</div>
+    <h2>ALERTA CRÍTICA</h2>
+    <p id="emMsg">Trabajador en emergencia</p>
+    <p id="emDetail" style="color:#9ca3af;font-size:13px"></p>
+    <button class="em-btn" onclick="dismissEmergency()">Confirmar Recibido</button>
+  </div>
+</div>
+
+<div class="detail-overlay" id="detailPanel">
+  <button class="close" onclick="closeDetail()">&times;</button>
+  <h3 style="margin-bottom:16px">Detalle de Alerta</h3>
+  <div id="detailContent"></div>
+</div>
+
 <div class="header">
   <h1>GUARDIAN INTELLIGENCE ALLIANCE</h1>
-  <div class="status">
-    <span class="status-dot" id="statusDot"></span>
-    <span id="statusText">Conectando...</span>
+  <div class="header-controls">
+    <div class="status">
+      <span class="status-dot" id="statusDot"></span>
+      <span id="statusText">Conectando...</span>
+    </div>
+    <a href="/dashboard/logout" class="btn-logout">Salir</a>
   </div>
 </div>
 
 <div class="grid">
-  <div class="card">
-    <h3>Trabajadores Activos</h3>
-    <div class="value success" id="workersCount">0</div>
+  <div class="card"><h3>Trabajadores</h3><div class="value success" id="workersCount">0</div></div>
+  <div class="card"><h3>Alertas Totales</h3><div class="value" id="alertsCount">0</div></div>
+  <div class="card"><h3>Críticas</h3><div class="value danger" id="criticalCount">0</div></div>
+  <div class="card"><h3>Sistema</h3><div class="value success" id="systemStatus">OK</div></div>
+</div>
+
+<div class="charts-row">
+  <div class="chart-box">
+    <h3>Pulso en Tiempo Real</h3>
+    <canvas id="pulseChart"></canvas>
   </div>
-  <div class="card">
-    <h3>Alertas Totales</h3>
-    <div class="value" id="alertsCount">0</div>
-  </div>
-  <div class="card">
-    <h3>Alertas Críticas</h3>
-    <div class="value danger" id="criticalCount">0</div>
-  </div>
-  <div class="card">
-    <h3>Estado del Sistema</h3>
-    <div class="value success" id="systemStatus">OK</div>
+  <div class="chart-box">
+    <h3>Temperatura / SpO2</h3>
+    <canvas id="vitalsChart"></canvas>
   </div>
 </div>
 
-<div class="main-grid">
-  <div class="table-card">
+<div class="map-wrap">
+  <div class="panel"><h3>Ubicación de Trabajadores</h3><div id="map"></div></div>
+</div>
+
+<div class="main-flex">
+  <div class="panel">
     <h3>Alertas en Tiempo Real</h3>
-    <div id="alertFeed">
+    <div class="filtros">
+      <select id="filterSeverity" onchange="applyFilters()">
+        <option value="">Todas</option>
+        <option value="normal">Normal</option>
+        <option value="alta">Alta</option>
+        <option value="critica">Crítica</option>
+      </select>
+      <input type="text" id="filterSearch" placeholder="Buscar trabajador..." oninput="applyFilters()" style="flex:1">
+      <button class="btn-export" onclick="exportCSV()">Exportar CSV</button>
+    </div>
+    <div class="alert-feed" id="alertFeed">
       <div class="empty-state">Esperando alertas del sistema...</div>
     </div>
   </div>
-  <div class="table-card">
+  <div class="panel">
     <h3>Trabajadores</h3>
-    <table>
-      <thead><tr><th>ID</th><th>Nombre</th><th>Rol</th><th>Estado</th></tr></thead>
-      <tbody id="workersTable">
-        <tr><td colspan="4" class="empty-state">Sin trabajadores registrados</td></tr>
-      </tbody>
-    </table>
+    <div class="table-wrap">
+      <table><thead><tr><th>ID</th><th>Nombre</th><th>Rol</th><th>Estado</th></tr></thead>
+        <tbody id="workersTable"><tr><td colspan="4" class="empty-state">Sin trabajadores</td></tr></tbody>
+      </table>
+    </div>
   </div>
 </div>
 
-<div class="footer-text">
-  GIA v0.1.0 — Sistema de Monitoreo Preventivo
-</div>
+<div class="footer-text">GIA v0.1.0 — Sistema de Monitoreo Preventivo</div>
 
 <script>
-const API_BASE = '/api/v1';
+const API = '/api/v1';
+let pulseChart, vitalsChart;
+let pulseData = [];
+let tempData = [];
+let spo2Data = [];
+let labels = [];
+const MAX_POINTS = 30;
+let alertasCache = [];
+let workerPositions = {1:[19.4326,-99.1332],2:[19.4350,-99.1300],3:[19.4300,-99.1360],4:[19.4340,-99.1280]};
+let map;
+let mapMarkers = {};
+let emergencyActive = false;
 
-async function fetchWorkers() {
-  try {
-    const res = await fetch(`${API_BASE}/trabajadores/`);
-    const workers = await res.json();
-    const tbody = document.getElementById('workersTable');
-    const count = document.getElementById('workersCount');
-
-    if (!workers.length) {
-      tbody.innerHTML = '<tr><td colspan="4" class="empty-state">Sin trabajadores registrados</td></tr>';
-      count.textContent = '0';
-      return;
+// Charts
+function initCharts() {
+  const ctx1 = document.getElementById('pulseChart').getContext('2d');
+  pulseChart = new Chart(ctx1, {
+    type: 'line',
+    data: {
+      labels: [], datasets: [{
+        label: 'Pulso (bpm)',
+        data: [], borderColor: '#00d4ff',
+        backgroundColor: 'rgba(0,212,255,0.1)',
+        fill: true, tension: .3, pointRadius: 2
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      scales: {
+        x: { display: false },
+        y: { min: 40, max: 200, grid: { color: 'rgba(255,255,255,0.05)' },
+             ticks: { color: '#6b7280', font: { size: 10 } } }
+      },
+      plugins: { legend: { labels: { color: '#6b7280', font: { size: 10 } } } }
     }
+  });
 
-    count.textContent = workers.length;
-    tbody.innerHTML = workers.map(w => `
-      <tr>
-        <td>#${w.id}</td>
-        <td>${w.nombre} ${w.apellido}</td>
-        <td>${w.rol}</td>
-        <td><span class="badge ${w.activo ? 'normal' : 'critica'}">${w.activo ? 'Activo' : 'Inactivo'}</span></td>
-      </tr>
-    `).join('');
-  } catch (e) {
-    console.error('Error fetching workers:', e);
-  }
+  const ctx2 = document.getElementById('vitalsChart').getContext('2d');
+  vitalsChart = new Chart(ctx2, {
+    type: 'line',
+    data: {
+      labels: [], datasets: [
+        { label: 'Temp (°C)', data: [], borderColor: '#ffaa00',
+          backgroundColor: 'rgba(255,170,0,0.1)', fill: true, tension: .3, pointRadius: 2, yAxisID: 'y' },
+        { label: 'SpO2 (%)', data: [], borderColor: '#00ff88',
+          backgroundColor: 'rgba(0,255,136,0.1)', fill: true, tension: .3, pointRadius: 2, yAxisID: 'y1' }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      scales: {
+        x: { display: false },
+        y: { min: 35, max: 42, grid: { color: 'rgba(255,255,255,0.05)' },
+             ticks: { color: '#6b7280', font: { size: 10 } } },
+        y1: { min: 85, max: 100, position: 'right',
+              grid: { drawOnChartArea: false },
+              ticks: { color: '#6b7280', font: { size: 10 } } }
+      },
+      plugins: { legend: { labels: { color: '#6b7280', font: { size: 10 } } } }
+    }
+  });
 }
 
-async function fetchAlerts() {
-  try {
-    const res = await fetch(`${API_BASE}/alertas/`);
-    const alerts = await res.json();
+function addChartPoint(pulso, temp, spo2) {
+  const now = new Date().toLocaleTimeString();
+  labels.push(now);
+  pulseData.push(pulso);
+  tempData.push(temp);
+  spo2Data.push(spo2);
+  if (labels.length > MAX_POINTS) { labels.shift(); pulseData.shift(); tempData.shift(); spo2Data.shift(); }
+  pulseChart.data.labels = labels;
+  pulseChart.data.datasets[0].data = pulseData;
+  pulseChart.update('none');
+  vitalsChart.data.labels = labels;
+  vitalsChart.data.datasets[0].data = tempData;
+  vitalsChart.data.datasets[1].data = spo2Data;
+  vitalsChart.update('none');
+}
 
+function initMap() {
+  map = L.map('map').setView([19.433, -99.132], 14);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap',
+    maxZoom: 18
+  }).addTo(map);
+}
+
+function updateMap(workers) {
+  workers.forEach(w => {
+    const pos = workerPositions[w.id] || [19.43 + Math.random()*0.01, -99.13 + Math.random()*0.01];
+    if (mapMarkers[w.id]) { mapMarkers[w.id].setLatLng(pos); return; }
+    const color = w.activo ? '#00ff88' : '#ff0044';
+    const icon = L.divIcon({
+      className: '', html: `<div style="width:14px;height:14px;border-radius:50%;background:${color};border:2px solid #0a0e17;box-shadow:0 0 8px ${color}40"></div>`,
+      iconSize: [14,14], iconAnchor: [7,7]
+    });
+    const marker = L.marker(pos, { icon }).addTo(map);
+    marker.bindPopup(`<b>${w.nombre} ${w.apellido}</b><br>${w.rol}<br>ID: #${w.id}`);
+    mapMarkers[w.id] = marker;
+  });
+}
+
+// Datos
+async function fetchAll() {
+  try {
+    const [workers, alerts] = await Promise.all([
+      fetch(`${API}/trabajadores/`).then(r=>r.json()),
+      fetch(`${API}/alertas/`).then(r=>r.json())
+    ]);
+    document.getElementById('workersCount').textContent = workers.length;
     document.getElementById('alertsCount').textContent = alerts.length;
-    const critical = alerts.filter(a => a.resultado?.nivel_gravedad === 'critica').length;
-    document.getElementById('criticalCount').textContent = critical;
-
-    const feed = document.getElementById('alertFeed');
-    if (!alerts.length) {
-      feed.innerHTML = '<div class="empty-state">Esperando alertas del sistema...</div>';
-      return;
-    }
-  } catch (e) {
-    console.error('Error fetching alerts:', e);
-  }
+    document.getElementById('criticalCount').textContent = alerts.filter(a => a.resultado?.nivel_gravedad === 'critica').length;
+    renderWorkers(workers);
+    updateMap(workers);
+    alertasCache = alerts;
+    applyFilters();
+  } catch(e) { console.error(e); }
 }
 
-function addAlertToFeed(data) {
+function renderWorkers(workers) {
+  const tbody = document.getElementById('workersTable');
+  if (!workers.length) { tbody.innerHTML = '<tr><td colspan="4" class="empty-state">Sin trabajadores</td></tr>'; return; }
+  tbody.innerHTML = workers.map(w => `
+    <tr>
+      <td>#${w.id}</td>
+      <td>${w.nombre} ${w.apellido}</td>
+      <td>${w.rol}</td>
+      <td><span class="badge ${w.activo?'normal':'critica'}">${w.activo?'Activo':'Inactivo'}</span></td>
+    </tr>
+  `).join('');
+}
+
+function renderAlerts(alerts) {
   const feed = document.getElementById('alertFeed');
-  const nivel = data.nivel_gravedad || 'normal';
-  const tipo = data.tipo_alerta || 'desconocido';
-  const id = data.trabajador_id || '?';
-  const time = new Date().toLocaleTimeString();
-
-  const el = document.createElement('div');
-  el.className = 'alert-item';
-  el.innerHTML = `
-    <span class="alert-icon ${nivel}"></span>
-    <div style="flex:1">
-      <strong>[${tipo.toUpperCase()}]</strong> Trabajador #${id}
-      <span class="badge ${nivel}" style="margin-left:8px">${nivel}</span>
-    </div>
-    <span class="alert-time">${time}</span>
-  `;
-  feed.insertBefore(el, feed.firstChild);
-
-  while (feed.children.length > 50) feed.removeChild(feed.lastChild);
-
-  document.getElementById('alertsCount').textContent =
-    parseInt(document.getElementById('alertsCount').textContent || '0') + 1;
-  if (nivel === 'critica') {
-    document.getElementById('criticalCount').textContent =
-      parseInt(document.getElementById('criticalCount').textContent || '0') + 1;
+  if (!alerts.length) {
+    feed.innerHTML = '<div class="empty-state">Sin alertas que coincidan</div>';
+    return;
   }
-
-  const empty = feed.querySelector('.empty-state');
-  if (empty) empty.remove();
+  const reversed = [...alerts].reverse();
+  feed.innerHTML = reversed.map((a,i) => {
+    const nivel = a.resultado?.nivel_gravedad || 'normal';
+    const tipo = a.alerta?.tipo || 'desconocido';
+    const wid = a.alerta?.trabajador_id || '?';
+    const time = a.timestamp ? new Date(a.timestamp).toLocaleTimeString() : '--';
+    return `<div class="alert-item" onclick="showDetail(${alertasCache.indexOf(a)})">
+      <span class="alert-icon ${nivel}"></span>
+      <div style="flex:1">
+        <span class="alert-tipo">${tipo}</span> Trabajador #${wid}
+        <span class="badge ${nivel}" style="margin-left:6px">${nivel}</span>
+      </div>
+      <span class="alert-time">${time}</span>
+    </div>`;
+  }).join('');
 }
 
-function connectWebSocket() {
-  const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
-  const ws = new WebSocket(`${protocol}//${location.host}/dashboard/ws`);
+function applyFilters() {
+  const severity = document.getElementById('filterSeverity').value;
+  const search = document.getElementById('filterSearch').value.toLowerCase();
+  let filtered = alertasCache;
+  if (severity) filtered = filtered.filter(a => a.resultado?.nivel_gravedad === severity);
+  if (search) filtered = filtered.filter(a => String(a.alerta?.trabajador_id).includes(search));
+  renderAlerts(filtered);
+}
+
+// Detalle
+function showDetail(idx) {
+  const a = alertasCache[idx];
+  if (!a) return;
+  const panel = document.getElementById('detailPanel');
+  const content = document.getElementById('detailContent');
+  const al = a.alerta || {};
+  const res = a.resultado || {};
+  const sv = al.signos_vitales || {};
+  content.innerHTML = `
+    <div class="detail-field"><label>ID Alerta</label><div class="val">#${idx}</div></div>
+    <div class="detail-field"><label>Trabajador</label><div class="val">#${al.trabajador_id}</div></div>
+    <div class="detail-field"><label>Tipo</label><div class="val">${al.tipo}</div></div>
+    <div class="detail-field"><label>Gravedad</label><div class="val"><span class="badge ${res.nivel_gravedad}">${res.nivel_gravedad}</span></div></div>
+    <div class="detail-field"><label>Timestamp</label><div class="val">${a.timestamp ? new Date(a.timestamp).toLocaleString() : '--'}</div></div>
+    <hr style="border-color:#1e3a5f;margin:12px 0">
+    <div class="detail-field"><label>Pulso</label><div class="val">${sv.pulso || '--'} bpm</div></div>
+    <div class="detail-field"><label>Temperatura</label><div class="val">${sv.temperatura || '--'} °C</div></div>
+    <div class="detail-field"><label>SpO2</label><div class="val">${sv.spo2 || '--'} %</div></div>
+    <div class="detail-field"><label>Horas Trabajadas</label><div class="val">${sv.horas_trabajadas || '--'} h</div></div>
+  `;
+  panel.classList.add('open');
+}
+function closeDetail() { document.getElementById('detailPanel').classList.remove('open'); }
+
+// Emergencia
+function showEmergency(a) {
+  if (emergencyActive) return;
+  emergencyActive = true;
+  const al = a.alerta || {};
+  document.getElementById('emMsg').textContent = `Trabajador #${al.trabajador_id} - ${al.tipo.toUpperCase()}`;
+  document.getElementById('emDetail').textContent = new Date().toLocaleString();
+  document.getElementById('emergencyOverlay').classList.add('show');
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    osc.frequency.value = 880;
+    osc.type = 'square';
+    const gain = ctx.createGain();
+    gain.gain.value = 0.15;
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    setTimeout(() => { osc.stop(); ctx.close(); }, 600);
+  } catch(_) {}
+}
+function dismissEmergency() {
+  emergencyActive = false;
+  document.getElementById('emergencyOverlay').classList.remove('show');
+}
+
+// WebSocket
+function connectWS() {
+  const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+  const ws = new WebSocket(`${proto}//${location.host}/dashboard/ws`);
   const dot = document.getElementById('statusDot');
   const text = document.getElementById('statusText');
 
@@ -299,28 +414,68 @@ function connectWebSocket() {
     dot.className = 'status-dot';
     text.textContent = 'Conectado';
   };
-
-  ws.onmessage = (e) => {
+  ws.onmessage = e => {
     try {
       const data = JSON.parse(e.data);
       addAlertToFeed(data);
-    } catch (_) {}
+    } catch(_) {}
   };
-
   ws.onclose = () => {
     dot.className = 'status-dot critical';
     text.textContent = 'Desconectado';
-    setTimeout(connectWebSocket, 3000);
+    setTimeout(connectWS, 3000);
   };
-
   ws.onerror = () => ws.close();
 }
 
-fetchWorkers();
-fetchAlerts();
-connectWebSocket();
-setInterval(fetchWorkers, 10000);
-setInterval(fetchAlerts, 10000);
+function addAlertToFeed(data) {
+  const nivel = data.nivel_gravedad || 'normal';
+  const tipo = data.tipo_alerta || 'desconocido';
+  const wid = data.trabajador_id || '?';
+  const time = new Date().toLocaleTimeString();
+
+  const entry = {
+    alerta: { trabajador_id: wid, tipo },
+    resultado: { nivel_gravedad: nivel },
+    timestamp: new Date().toISOString()
+  };
+  alertasCache.push(entry);
+  document.getElementById('alertsCount').textContent = parseInt(document.getElementById('alertsCount').textContent) + 1;
+  if (nivel === 'critica') {
+    document.getElementById('criticalCount').textContent = parseInt(document.getElementById('criticalCount').textContent) + 1;
+    showEmergency(entry);
+  }
+  applyFilters();
+
+  if (data.signos_vitales) {
+    const sv = data.signos_vitales;
+    addChartPoint(sv.pulso || 80, sv.temperatura || 36.5, sv.spo2 || 97);
+  }
+}
+
+// Export
+function exportCSV() {
+  if (!alertasCache.length) return;
+  let csv = 'ID,Trabajador,Tipo,Gravedad,Timestamp,Pulso,Temp,SpO2\n';
+  alertasCache.forEach((a,i) => {
+    const al = a.alerta || {}; const res = a.resultado || {}; const sv = al.signos_vitales || {};
+    const time = a.timestamp ? new Date(a.timestamp).toLocaleString() : '';
+    csv += `${i},#${al.trabajador_id},${al.tipo},${res.nivel_gravedad},"${time}",${sv.pulso||''},${sv.temperatura||''},${sv.spo2||''}\n`;
+  });
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `gia-alertas-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// Init
+initCharts();
+initMap();
+fetchAll();
+connectWS();
+setInterval(fetchAll, 10000);
 </script>
 </body>
 </html>
