@@ -1,44 +1,46 @@
-#include <WiFi.h>
-#include <PubSubClient.h>
+import joblib
+import numpy as np
+import os
+from typing import Dict, Any
 
-const char* ssid = "TU_WIFI";
-const char* password = "TU_PASSWORD";
+MODEL_DIR = os.path.join(os.path.dirname(__file__), "..", "modelos")
+MODEL_PATH = os.path.join(MODEL_DIR, "modelo_riesgo_fatiga.pkl")
+SCALER_PATH = os.path.join(MODEL_DIR, "scaler.pkl")
 
-const char* mqtt_server = "test.mosquitto.org";
-WiFiClient espClient;
-PubSubClient client(espClient);
+_model = None
+_scaler = None
 
-void setup_wifi() {
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-  }
-}
+def _cargar_modelo():
+    global _model, _scaler
+    if _model is None:
+        _model = joblib.load(MODEL_PATH)
+        _scaler = joblib.load(SCALER_PATH)
 
-void reconnect() {
-  while (!client.connected()) {
-    if (client.connect("ChalecoInteligente")) {
-      client.subscribe("agi-system/alertas");
-    } else {
-      delay(5000);
+def predecir_riesgo_fatiga(signos_vitales: Dict[str, Any]) -> Dict[str, Any]:
+    _cargar_modelo()
+
+    pulso = signos_vitales.get("pulso", 80)
+    temperatura = signos_vitales.get("temperatura", 36.5)
+    spo2 = signos_vitales.get("spo2", 97)
+    horas_trabajadas = signos_vitales.get("horas_trabajadas", 4)
+
+    X = np.array([[pulso, temperatura, spo2, horas_trabajadas]])
+    X_scaled = _scaler.transform(X)
+
+    riesgo = _model.predict(X_scaled)[0]
+    probabilidades = _model.predict_proba(X_scaled)[0]
+    confianza = max(probabilidades)
+
+    niveles_prioridad = {"bajo": 1, "medio": 2, "alto": 3}
+
+    return {
+        "riesgo": riesgo,
+        "confianza": round(float(confianza), 3),
+        "prioridad": niveles_prioridad.get(riesgo, 1),
+        "signos_procesados": {
+            "pulso": pulso,
+            "temperatura": temperatura,
+            "spo2": spo2,
+            "horas_trabajadas": horas_trabajadas
+        }
     }
-  }
-}
-
-void setup() {
-  Serial.begin(115200);
-  setup_wifi();
-  client.setServer(mqtt_server, 1883);
-}
-
-void loop() {
-  if (!client.connected()) {
-    reconnect();
-  }
-  client.loop();
-
-  // Simulación de signos vitales
-  String payload = "{\"trabajador_id\":2, \"tipo\":\"signos\", \"signos_vitales\":{\"pulso\":120}}";
-  client.publish("agi-system/alertas", payload.c_str());
-  delay(5000);
-}

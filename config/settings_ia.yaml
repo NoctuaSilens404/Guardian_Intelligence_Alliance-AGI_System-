@@ -1,1 +1,19 @@
+modelo:
+  path: "src/ia/modelos/modelo_riesgo_fatiga.pkl"
+  scaler_path: "src/ia/modelos/scaler.pkl"
+  tipo: "RandomForestClassifier"
+  features:
+    - pulso
+    - temperatura
+    - spo2
+    - horas_trabajadas
 
+entrenamiento:
+  test_size: 0.2
+  random_state: 42
+  n_estimators: 100
+  max_depth: 5
+
+umbrales:
+  riesgo_alto: 0.7
+  riesgo_medio: 0.4

@@ -1,6 +1,6 @@
 import requests
 
-BACKEND_URL = "http://localhost:8000/alertas/nueva"
+BACKEND_URL = "http://localhost:8000/api/v1/alertas/nueva"
 
 def enviar_alerta_http(data: dict):
     try:

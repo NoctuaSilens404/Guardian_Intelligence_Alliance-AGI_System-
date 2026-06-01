@@ -1,1 +1,25 @@
+dispositivos:
+  casco:
+    firmware: "src/iot/cascos/firmware_casco.ino"
+    config: "src/iot/cascos/config.h"
+    sensores:
+      - pulso
+      - temperatura
+      - spo2
+      - caida
+      - boton_panico
 
+  chaleco:
+    firmware: "src/iot/chalecos/firmware_chaleco.ino"
+    config: "src/iot/chalecos/config.h"
+    sensores:
+      - pulso
+      - temperatura
+      - spo2
+      - boton_panico
+
+red:
+  protocolo: "MQTT"
+  broker: ${MQTT_BROKER:-localhost}
+  puerto: ${MQTT_PORT:-1883}
+  intervalo_lectura_ms: 5000

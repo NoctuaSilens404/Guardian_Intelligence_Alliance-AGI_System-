@@ -1,14 +1,9 @@
-from .motor_triaje import clasificar_evento
-from .notificaciones import enviar_notificacion
+from core.motor_triaje import clasificar_evento
+from core.notificaciones import enviar_notificacion
 
-def procesar_alerta(data: dict):
-    """
-    Procesa una alerta recibida desde un casco o chaleco inteligente.
-    """
-    # 1. Clasificar la gravedad del evento
+def procesar_alerta(data: dict) -> dict:
     nivel = clasificar_evento(data)
 
-    # 2. Preparar mensaje
     mensaje = {
         "trabajador_id": data.get("trabajador_id"),
         "tipo_alerta": data.get("tipo"),
@@ -17,7 +12,6 @@ def procesar_alerta(data: dict):
         "ubicacion": data.get("ubicacion", {})
     }
 
-    # 3. Enviar notificación al dashboard
     enviar_notificacion(mensaje)
 
     return {
