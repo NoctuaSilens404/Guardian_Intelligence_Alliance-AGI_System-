@@ -60,9 +60,17 @@ Backend FastAPI
             └─▶ MQTT (comandos a dispositivos)
 ```
 
+### 5. Dashboard (Monitoreo en Tiempo Real)
+Interfaz web para supervisión:
+- **URL**: `/dashboard`
+- **WebSocket**: `/dashboard/ws` para alertas en vivo
+- **Métricas**: trabajadores activos, total alertas, alertas críticas
+- **Feed**: historial de alertas en tiempo real
+
 ## Stack Tecnológico
 
 - Backend: Python 3.14+, FastAPI, Uvicorn
+- Dashboard: HTML, CSS, JavaScript vanilla, WebSockets
 - IA: scikit-learn, pandas, joblib
 - IoT: C++ (Arduino/ESP32), MQTT, PubSubClient
 - Testing: pytest, httpx

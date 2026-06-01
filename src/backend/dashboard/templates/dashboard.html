@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GIA - Guardian Intelligence Alliance</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: #0a0e17;
+    color: #e0e0e0;
+    min-height: 100vh;
+  }
+  .header {
+    background: linear-gradient(135deg, #0d1b2a 0%, #1b2838 100%);
+    border-bottom: 1px solid #1e3a5f;
+    padding: 16px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .header h1 {
+    font-size: 20px;
+    font-weight: 600;
+    background: linear-gradient(90deg, #00d4ff, #0077b6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .header .status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+  }
+  .status-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: #00ff88;
+    display: inline-block;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+  .status-dot.warning { background: #ffaa00; animation: none; }
+  .status-dot.critical { background: #ff0044; animation: none; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    padding: 20px 32px;
+  }
+  @media (max-width: 1200px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+
+  .card {
+    background: linear-gradient(135deg, #111827 0%, #1a2332 100%);
+    border: 1px solid #1e3a5f;
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .card h3 {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #6b7280;
+    margin-bottom: 12px;
+  }
+  .card .value {
+    font-size: 32px;
+    font-weight: 700;
+    color: #00d4ff;
+  }
+  .card .value.danger { color: #ff0044; }
+  .card .value.warning { color: #ffaa00; }
+  .card .value.success { color: #00ff88; }
+
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    padding: 0 32px 20px;
+  }
+  @media (max-width: 900px) { .main-grid { grid-template-columns: 1fr; } }
+
+  .table-card {
+    background: linear-gradient(135deg, #111827 0%, #1a2332 100%);
+    border: 1px solid #1e3a5f;
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .table-card h3 {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #6b7280;
+    margin-bottom: 12px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  th {
+    text-align: left;
+    padding: 8px 12px;
+    color: #6b7280;
+    font-weight: 500;
+    border-bottom: 1px solid #1e3a5f;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #1a2738;
+  }
+  tr:hover td { background: rgba(0, 212, 255, 0.03); }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .badge.normal { background: rgba(0, 255, 136, 0.15); color: #00ff88; }
+  .badge.alta { background: rgba(255, 170, 0, 0.15); color: #ffaa00; }
+  .badge.critica { background: rgba(255, 0, 68, 0.15); color: #ff0044; }
+
+  .alert-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid #1a2738;
+    font-size: 13px;
+  }
+  .alert-icon {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  }
+  .alert-icon.normal { background: #00ff88; }
+  .alert-icon.alta { background: #ffaa00; }
+  .alert-icon.critica { background: #ff0044; }
+
+  .alert-time { color: #6b7280; font-size: 11px; white-space: nowrap; }
+  .empty-state {
+    text-align: center; padding: 40px 20px; color: #4b5563; font-size: 14px;
+  }
+
+  .footer-text {
+    text-align: center;
+    padding: 16px;
+    color: #374151;
+    font-size: 12px;
+    border-top: 1px solid #1a2738;
+    margin-top: 8px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>GUARDIAN INTELLIGENCE ALLIANCE</h1>
+  <div class="status">
+    <span class="status-dot" id="statusDot"></span>
+    <span id="statusText">Conectando...</span>
+  </div>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <h3>Trabajadores Activos</h3>
+    <div class="value success" id="workersCount">0</div>
+  </div>
+  <div class="card">
+    <h3>Alertas Totales</h3>
+    <div class="value" id="alertsCount">0</div>
+  </div>
+  <div class="card">
+    <h3>Alertas Críticas</h3>
+    <div class="value danger" id="criticalCount">0</div>
+  </div>
+  <div class="card">
+    <h3>Estado del Sistema</h3>
+    <div class="value success" id="systemStatus">OK</div>
+  </div>
+</div>
+
+<div class="main-grid">
+  <div class="table-card">
+    <h3>Alertas en Tiempo Real</h3>
+    <div id="alertFeed">
+      <div class="empty-state">Esperando alertas del sistema...</div>
+    </div>
+  </div>
+  <div class="table-card">
+    <h3>Trabajadores</h3>
+    <table>
+      <thead><tr><th>ID</th><th>Nombre</th><th>Rol</th><th>Estado</th></tr></thead>
+      <tbody id="workersTable">
+        <tr><td colspan="4" class="empty-state">Sin trabajadores registrados</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="footer-text">
+  GIA v0.1.0 — Sistema de Monitoreo Preventivo
+</div>
+
+<script>
+const API_BASE = '/api/v1';
+
+async function fetchWorkers() {
+  try {
+    const res = await fetch(`${API_BASE}/trabajadores/`);
+    const workers = await res.json();
+    const tbody = document.getElementById('workersTable');
+    const count = document.getElementById('workersCount');
+
+    if (!workers.length) {
+      tbody.innerHTML = '<tr><td colspan="4" class="empty-state">Sin trabajadores registrados</td></tr>';
+      count.textContent = '0';
+      return;
+    }
+
+    count.textContent = workers.length;
+    tbody.innerHTML = workers.map(w => `
+      <tr>
+        <td>#${w.id}</td>
+        <td>${w.nombre} ${w.apellido}</td>
+        <td>${w.rol}</td>
+        <td><span class="badge ${w.activo ? 'normal' : 'critica'}">${w.activo ? 'Activo' : 'Inactivo'}</span></td>
+      </tr>
+    `).join('');
+  } catch (e) {
+    console.error('Error fetching workers:', e);
+  }
+}
+
+async function fetchAlerts() {
+  try {
+    const res = await fetch(`${API_BASE}/alertas/`);
+    const alerts = await res.json();
+
+    document.getElementById('alertsCount').textContent = alerts.length;
+    const critical = alerts.filter(a => a.resultado?.nivel_gravedad === 'critica').length;
+    document.getElementById('criticalCount').textContent = critical;
+
+    const feed = document.getElementById('alertFeed');
+    if (!alerts.length) {
+      feed.innerHTML = '<div class="empty-state">Esperando alertas del sistema...</div>';
+      return;
+    }
+  } catch (e) {
+    console.error('Error fetching alerts:', e);
+  }
+}
+
+function addAlertToFeed(data) {
+  const feed = document.getElementById('alertFeed');
+  const nivel = data.nivel_gravedad || 'normal';
+  const tipo = data.tipo_alerta || 'desconocido';
+  const id = data.trabajador_id || '?';
+  const time = new Date().toLocaleTimeString();
+
+  const el = document.createElement('div');
+  el.className = 'alert-item';
+  el.innerHTML = `
+    <span class="alert-icon ${nivel}"></span>
+    <div style="flex:1">
+      <strong>[${tipo.toUpperCase()}]</strong> Trabajador #${id}
+      <span class="badge ${nivel}" style="margin-left:8px">${nivel}</span>
+    </div>
+    <span class="alert-time">${time}</span>
+  `;
+  feed.insertBefore(el, feed.firstChild);
+
+  while (feed.children.length > 50) feed.removeChild(feed.lastChild);
+
+  document.getElementById('alertsCount').textContent =
+    parseInt(document.getElementById('alertsCount').textContent || '0') + 1;
+  if (nivel === 'critica') {
+    document.getElementById('criticalCount').textContent =
+      parseInt(document.getElementById('criticalCount').textContent || '0') + 1;
+  }
+
+  const empty = feed.querySelector('.empty-state');
+  if (empty) empty.remove();
+}
+
+function connectWebSocket() {
+  const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+  const ws = new WebSocket(`${protocol}//${location.host}/dashboard/ws`);
+  const dot = document.getElementById('statusDot');
+  const text = document.getElementById('statusText');
+
+  ws.onopen = () => {
+    dot.className = 'status-dot';
+    text.textContent = 'Conectado';
+  };
+
+  ws.onmessage = (e) => {
+    try {
+      const data = JSON.parse(e.data);
+      addAlertToFeed(data);
+    } catch (_) {}
+  };
+
+  ws.onclose = () => {
+    dot.className = 'status-dot critical';
+    text.textContent = 'Desconectado';
+    setTimeout(connectWebSocket, 3000);
+  };
+
+  ws.onerror = () => ws.close();
+}
+
+fetchWorkers();
+fetchAlerts();
+connectWebSocket();
+setInterval(fetchWorkers, 10000);
+setInterval(fetchAlerts, 10000);
+</script>
+</body>
+</html>
