@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import JSONResponse
-from api.routes_alertas import router as alertas_router
-from api.routes_trabajadores import router as trabajadores_router
+from api.routes_alertas import router as alertas_router, alertas_db
+from api.routes_trabajadores import router as trabajadores_router, trabajadores_db
 from dashboard.routes_dashboard import router as dashboard_router
 from models import Trabajador, Alerta
 from api.routes_alertas import crear_alerta
@@ -38,7 +38,7 @@ def health_check():
 
 @app.on_event("startup")
 async def seed_data():
-    if not trabajadores_router.trabajadores_db:
+    if not trabajadores_db:
         for w in [
             Trabajador(id=1, nombre="Carlos", apellido="Mendoza", dni="12345678", rol="Soldador"),
             Trabajador(id=2, nombre="Ana", apellido="López", dni="23456789", rol="Supervisora"),
@@ -47,7 +47,7 @@ async def seed_data():
         ]:
             crear_trabajador(w)
 
-    if not alertas_router.alertas_db:
+    if not alertas_db:
         for a in [
             Alerta(trabajador_id=1, tipo="signos", signos_vitales={"pulso": 78, "temperatura": 36.8, "spo2": 97, "horas_trabajadas": 4}),
             Alerta(trabajador_id=2, tipo="signos", signos_vitales={"pulso": 95, "temperatura": 37.5, "spo2": 95, "horas_trabajadas": 6}),
